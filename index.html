@@ -714,6 +714,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button id="btn-reset" onclick="resetScore()" style="display:none;flex:1;padding:14px;border-radius:var(--radius);border:1px solid rgba(255,82,82,.35);background:rgba(255,82,82,.08);color:#ff5252;font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer;letter-spacing:.02em;">Reset</button>
       <button class="btn-save" onclick="saveScore()">Save Score</button>
     </div>
   </div>
@@ -894,7 +895,17 @@ function openScoreModal(key, pa, pb) {
   document.getElementById('modal-pb').textContent = pb;
   document.getElementById('disp-a').textContent = scoreA;
   document.getElementById('disp-b').textContent = scoreB;
+  document.getElementById('btn-reset').style.display = scores[key] ? 'block' : 'none';
   document.getElementById('score-modal').classList.add('open');
+}
+
+function resetScore() {
+  if (!currentKey) return;
+  delete scores[currentKey];
+  persistScores();
+  closeModal();
+  buildSchedule();
+  buildStandings();
 }
 
 function adj(side, delta) {
