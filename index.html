@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FIFA Tournament 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --surface: #0f1520;
+    --card: #131c2a;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.15);
+    --green: #00e676;
+    --green-dim: rgba(0,230,118,0.12);
+    --amber: #ffab00;
+    --amber-dim: rgba(255,171,0,0.12);
+    --blue: #448aff;
+    --blue-dim: rgba(68,138,255,0.12);
+    --text: #e8edf5;
+    --muted: #5a6a7e;
+    --muted2: #3a4a5e;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* PITCH TEXTURE BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 40px,
+        rgba(255,255,255,0.012) 40px,
+        rgba(255,255,255,0.012) 80px
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; }
+
+  /* HEADER */
+  .header {
+    padding: 28px 20px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% -20%, rgba(0,230,118,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-eyebrow {
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .header-title {
+    font-family: var(--font-display);
+    font-size: 48px;
+    letter-spacing: 3px;
+    line-height: .95;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .header-title em {
+    color: var(--green);
+    font-style: normal;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: .04em;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 0 16px 20px;
+  }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--green);
+    opacity: .4;
+  }
+  .stat-val {
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: 1px;
+    color: #fff;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 3px;
+    font-weight: 400;
+  }
+
+  /* TABS */
+  .tabs-wrap {
+    padding: 0 16px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    padding-top: 10px;
+  }
+  .tabs {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px;
+    gap: 2px;
+  }
+  .tab {
+    flex: 1;
+    padding: 9px 4px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .tab.active {
+    background: var(--green);
+    color: #000;
+  }
+
+  /* PANELS */
+  .panel { display: none; padding: 0 16px 100px; }
+  .panel.active { display: block; }
+
+  /* SECTION HEADER */
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0 12px;
+  }
+  .section-head:first-child { margin-top: 0; }
+  .section-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-a { background: var(--blue); }
+  .dot-b { background: var(--amber); }
+  .dot-c { background: var(--green); }
+  .section-name {
+    font-family: var(--font-display);
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: #fff;
+  }
+  .section-players {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-left: auto;
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  /* ROUND */
+  .round-block { margin-bottom: 6px; }
+  .round-label-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .round-pill {
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .round-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* MATCH CARD */
+  .match-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: border-color .2s, transform .1s;
+    -webkit-user-select: none;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .match-card:active { transform: scale(0.98); }
+  .match-card.done { border-color: var(--border-bright); }
+  .match-card.done::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--green);
+  }
+
+  .console-pill {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    padding: 3px 7px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .c1 { background: var(--blue-dim); color: var(--blue); }
+  .c2 { background: var(--amber-dim); color: var(--amber); }
+
+  .match-players {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .p-name {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .p-name.right { text-align: right; }
+  .vs-dot {
+    font-size: 10px;
+    color: var(--muted2);
+    font-weight: 400;
+    flex-shrink: 0;
+  }
+  .score-chip {
+    font-family: var(--font-display);
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 10px;
+    min-width: 52px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .score-chip.filled {
+    color: #fff;
+    border-color: var(--border-bright);
+  }
+
+  /* STANDINGS TABLE */
+  .standings-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .standings-card table { width: 100%; border-collapse: collapse; }
+  .standings-card th {
+    font-size: 9px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .standings-card th:not(:first-child):not(:nth-child(2)) { text-align: center; }
+  .standings-card td {
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  .standings-card tr:last-child td { border-bottom: none; }
+  .standings-card td:not(:first-child):not(:nth-child(2)) { text-align: center; color: var(--muted); font-size: 12px; }
+  .rank { font-family: var(--font-display); font-size: 18px; color: var(--muted2); min-width: 28px; }
+  .rank.top { color: var(--green); }
+  .pts-val { font-family: var(--font-display); font-size: 18px; color: #fff !important; }
+  .adv-row td { background: var(--green-dim); }
+  .adv-row td:first-child { border-left: 2px solid var(--green); }
+
+  /* GROUPS PANEL */
+  .group-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .group-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .group-card.ga::before { background: var(--blue); }
+  .group-card.gb::before { background: var(--amber); }
+  .group-card.gc::before { background: var(--green); }
+  .group-card-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    color: #fff;
+  }
+  .player-list { display: flex; flex-direction: column; gap: 6px; }
+  .player-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    background: var(--surface);
+    border-radius: 8px;
+  }
+  .player-num {
+    font-family: var(--font-display);
+    font-size: 16px;
+    color: var(--muted2);
+    min-width: 18px;
+  }
+  .player-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .player-flag {
+    margin-left: auto;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    opacity: .6;
+  }
+  .fa-col { background: var(--blue); }
+  .fb-col { background: var(--amber); }
+  .fc-col { background: var(--green); }
+
+  /* SCORE MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.75);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    background: var(--surface);
+    border: 1px solid var(--border-bright);
+    border-bottom: none;
+    border-radius: 20px 20px 0 0;
+    padding: 20px 24px 40px;
+    width: 100%;
+    max-width: 480px;
+    animation: slideUp .25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+  .modal-handle {
+    width: 36px; height: 3px;
+    background: var(--muted2);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+  .modal-matchup {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .modal-names {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .modal-hint { font-size: 11px; color: var(--muted); }
+  .score-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .score-player { text-align: center; }
+  .score-pname {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    letter-spacing: .04em;
+  }
+  .score-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .score-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border-bright);
+    background: var(--card);
+    color: var(--text);
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .score-display {
+    font-family: var(--font-display);
+    font-size: 42px;
+    color: #fff;
+    min-width: 48px;
+    text-align: center;
+    line-height: 1;
+  }
+  .score-sep {
+    font-family: var(--font-display);
+    font-size: 28px;
+    color: var(--muted2);
+    padding-bottom: 4px;
+  }
+  .modal-actions { display: flex; gap: 10px; }
+  .btn-cancel {
+    flex: 1;
+    padding: 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-bright);
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-save {
+    flex: 2;
+    padding: 14px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--green);
+    color: #000;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: .04em;
+  }
+  .btn-save:active { opacity: .85; }
+
+  /* KNOCKOUT INFO */
+  .ko-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .ko-stage {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 8px;
+  }
+  .ko-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+  .ko-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .ko-match {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--surface);
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+  .ko-match-num {
+    font-family: var(--font-display);
+    font-size: 16px;
+    color: var(--muted2);
+    min-width: 20px;
+  }
+  .ko-match-desc { color: var(--text); flex: 1; }
+  .ko-match-con { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+
+  /* ENTRY ANIMATION */
+  .panel.active .match-card,
+  .panel.active .group-card,
+  .panel.active .standings-card,
+  .panel.active .ko-card {
+    animation: fadeUp .3s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .panel.active .match-card:nth-child(1) { animation-delay: .03s; }
+  .panel.active .match-card:nth-child(2) { animation-delay: .06s; }
+  .panel.active .match-card:nth-child(3) { animation-delay: .09s; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="header-bg"></div>
+    <div class="header-eyebrow">&#9917; FIFA Tournament 2026</div>
+    <div class="header-title">GROUP<br><em>STAGE</em></div>
+    <div class="header-sub">12 Players · 3 Groups · 2 Consoles</div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-val">18</div>
+      <div class="stat-label">Matches</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="played-count">0</div>
+      <div class="stat-label">Played</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">3</div>
+      <div class="stat-label">Per player</div>
+    </div>
+  </div>
+
+  <div class="tabs-wrap">
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('schedule',event)">Schedule</button>
+      <button class="tab" onclick="showTab('standings',event)">Standings</button>
+      <button class="tab" onclick="showTab('groups',event)">Groups</button>
+      <button class="tab" onclick="showTab('knockout',event)">Knockouts</button>
+    </div>
+  </div>
+
+  <div class="panel active" id="tab-schedule"></div>
+  <div class="panel" id="tab-standings"></div>
+  <div class="panel" id="tab-groups"></div>
+  <div class="panel" id="tab-knockout">
+    <div style="margin-top:4px">
+      <div class="ko-card" style="border-color:rgba(0,230,118,.25)">
+        <div class="ko-stage">&#10003; Who advances</div>
+        <div class="ko-title">Top 2 from each group</div>
+        <div class="ko-desc">6 players total advance to the knockout stage. Check standings to see who qualifies (highlighted in green).</div>
+      </div>
+
+      <div class="section-head" style="margin-top:20px">
+        <div class="section-dot" style="background:var(--amber)"></div>
+        <div class="section-name">SEMI FINALS</div>
+      </div>
+
+      <div class="ko-card">
+        <div class="ko-stage">3 matches · run 2 simultaneously</div>
+        <div class="ko-title">Cross-group matchups</div>
+        <div class="ko-desc">Winners advance. Two matches run at the same time on both consoles.</div>
+        <div class="ko-match">
+          <div class="ko-match-num">S1</div>
+          <div class="ko-match-desc"><strong>1st Group A</strong> vs 2nd Group B</div>
+          <span class="ko-match-con c1">C1</span>
+        </div>
+        <div class="ko-match">
+          <div class="ko-match-num">S2</div>
+          <div class="ko-match-desc"><strong>1st Group B</strong> vs 2nd Group C</div>
+          <span class="ko-match-con c2">C2</span>
+        </div>
+        <div class="ko-match">
+          <div class="ko-match-num">S3</div>
+          <div class="ko-match-desc"><strong>1st Group C</strong> vs 2nd Group A</div>
+          <span class="ko-match-con c1">C1</span>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:20px">
+        <div class="section-dot" style="background:var(--green)"></div>
+        <div class="section-name">FINALS</div>
+      </div>
+
+      <div class="ko-card" style="border-color:rgba(0,230,118,.2)">
+        <div class="ko-stage">Recommended · Option B</div>
+        <div class="ko-title">Mini round-robin finals</div>
+        <div class="ko-desc">The 3 semi winners play each other once — 3 more matches. Most points wins the tournament. Keeps everyone playing and avoids a single sudden-death moment.</div>
+        <div class="ko-match">
+          <div class="ko-match-num">F1</div>
+          <div class="ko-match-desc">Semi winner 1 vs Semi winner 2</div>
+          <span class="ko-match-con c1">C1</span>
+        </div>
+        <div class="ko-match">
+          <div class="ko-match-num">F2</div>
+          <div class="ko-match-desc">Semi winner 2 vs Semi winner 3</div>
+          <span class="ko-match-con c2">C2</span>
+        </div>
+        <div class="ko-match">
+          <div class="ko-match-num">F3</div>
+          <div class="ko-match-desc">Semi winner 1 vs Semi winner 3</div>
+          <span class="ko-match-con c1">C1</span>
+        </div>
+      </div>
+
+      <div class="ko-card" style="margin-top:6px;border-color:rgba(255,171,0,.2)">
+        <div class="ko-stage">Alternative · Option A</div>
+        <div class="ko-title">Draw + sudden death</div>
+        <div class="ko-desc">Draw lots among the 3 semi winners. Two play the final, the third waits. Winner of that match is champion.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PASSWORD MODAL -->
+<div class="modal-overlay" id="pw-modal">
+  <div class="modal-sheet" style="padding-bottom:32px">
+    <div class="modal-handle"></div>
+    <div class="modal-matchup">
+      <div style="font-size:28px;margin-bottom:8px">&#128274;</div>
+      <div class="modal-names" style="font-size:20px">Enter Password</div>
+      <div class="modal-hint">Only the scorekeeper can update results</div>
+    </div>
+    <div style="margin-bottom:20px">
+      <input type="password" id="pw-input" placeholder="••••••••" autocomplete="off"
+        style="width:100%;padding:14px 16px;background:var(--card);border:1px solid var(--border-bright);border-radius:var(--radius);color:var(--text);font-family:var(--font-body);font-size:16px;text-align:center;letter-spacing:.2em;outline:none;"
+        onkeydown="if(event.key==='Enter')checkPassword()" />
+      <div id="pw-error" style="font-size:11px;color:#ff5252;text-align:center;margin-top:8px;min-height:16px;letter-spacing:.04em"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePwModal()">Cancel</button>
+      <button class="btn-save" onclick="checkPassword()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCORE MODAL (bottom sheet) -->
+<div class="modal-overlay" id="score-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-matchup">
+      <div class="modal-names" id="modal-names">Player A vs Player B</div>
+      <div class="modal-hint">Tap +/- to set the score</div>
+    </div>
+    <div class="score-row">
+      <div class="score-player">
+        <div class="score-pname" id="modal-pa">-</div>
+        <div class="score-input-wrap">
+          <button class="score-btn" onclick="adj('a',-1)">−</button>
+          <div class="score-display" id="disp-a">0</div>
+          <button class="score-btn" onclick="adj('a',1)">+</button>
+        </div>
+      </div>
+      <div class="score-sep">:</div>
+      <div class="score-player">
+        <div class="score-pname" id="modal-pb">-</div>
+        <div class="score-input-wrap">
+          <button class="score-btn" onclick="adj('b',-1)">−</button>
+          <div class="score-display" id="disp-b">0</div>
+          <button class="score-btn" onclick="adj('b',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveScore()">Save Score</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const groups = [
+  { id:'a', label:'Group A', cls:'ga', dotCls:'dot-a', playerCol:'fa-col', players: ['Prithvi','Aditya','Vatsalya','Akarsh'] },
+  { id:'b', label:'Group B', cls:'gb', dotCls:'dot-b', playerCol:'fb-col', players: ['Haggai','Bipin','Varun','Ashwin'] },
+  { id:'c', label:'Group C', cls:'gc', dotCls:'dot-c', playerCol:'fc-col', players: ['Siddharth','Makarand','Praveen','David'] },
+];
+
+const rrRounds = [[[0,3],[1,2]],[[0,1],[2,3]],[[0,2],[1,3]]];
+const consoles = [['C1','C2'],['C2','C1'],['C1','C2']];
+const scores = {};
+
+function matchKey(gid,r,m) { return `${gid}-r${r}-m${m}`; }
+
+function buildSchedule() {
+  const body = document.getElementById('tab-schedule');
+  body.innerHTML = '';
+  groups.forEach(g => {
+    const head = document.createElement('div');
+    head.className = 'section-head';
+    head.innerHTML = `
+      <div class="section-dot ${g.dotCls}"></div>
+      <div class="section-name">${g.label.toUpperCase()}</div>
+      <div class="section-players">${g.players.join(' · ')}</div>`;
+    body.appendChild(head);
+
+    rrRounds.forEach((round, ri) => {
+      const rblock = document.createElement('div');
+      rblock.className = 'round-block';
+      rblock.innerHTML = `<div class="round-label-row"><span class="round-pill">Round ${ri+1}</span><div class="round-line"></div></div>`;
+      round.forEach(([i,j], mi) => {
+        const key = matchKey(g.id, ri, mi);
+        const s = scores[key];
+        const con = consoles[ri][mi];
+        const card = document.createElement('div');
+        card.className = 'match-card' + (s ? ' done' : '');
+        card.innerHTML = `
+          <span class="console-pill ${con==='C1'?'c1':'c2'}">${con}</span>
+          <div class="match-players">
+            <span class="p-name">${g.players[i]}</span>
+            <span class="vs-dot">vs</span>
+            <span class="p-name right">${g.players[j]}</span>
+          </div>
+          <div class="score-chip${s?' filled':''}">${s ? s[0]+':'+s[1] : '·:·'}</div>`;
+        card.onclick = () => openModal(key, g.players[i], g.players[j]);
+        rblock.appendChild(card);
+      });
+      body.appendChild(rblock);
+    });
+  });
+  updateStats();
+}
+
+function updateStats() {
+  document.getElementById('played-count').textContent = Object.keys(scores).length;
+}
+
+function buildStandings() {
+  const body = document.getElementById('tab-standings');
+  body.innerHTML = '';
+  groups.forEach(g => {
+    const head = document.createElement('div');
+    head.className = 'section-head';
+    head.innerHTML = `<div class="section-dot ${g.dotCls}"></div><div class="section-name">${g.label.toUpperCase()}</div>`;
+    body.appendChild(head);
+
+    const st = g.players.map(p => ({p, pts:0, gf:0, ga:0, gd:0, w:0, d:0, l:0}));
+    rrRounds.forEach((round,ri) => {
+      round.forEach(([i,j],mi) => {
+        const s = scores[matchKey(g.id,ri,mi)];
+        if (!s) return;
+        const [ga,gb] = s;
+        st[i].gf+=ga; st[i].ga+=gb; st[i].gd+=ga-gb;
+        st[j].gf+=gb; st[j].ga+=ga; st[j].gd+=gb-ga;
+        if(ga>gb){st[i].pts+=3;st[i].w++;st[j].l++;}
+        else if(ga<gb){st[j].pts+=3;st[j].w++;st[i].l++;}
+        else{st[i].pts++;st[j].pts++;st[i].d++;st[j].d++;}
+      });
+    });
+    st.sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);
+
+    const card = document.createElement('div');
+    card.className = 'standings-card';
+    const tbl = document.createElement('table');
+    tbl.innerHTML = `<thead><tr><th>#</th><th>Player</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr></thead>`;
+    const tbody = document.createElement('tbody');
+    st.forEach((s,idx) => {
+      const tr = document.createElement('tr');
+      if (idx < 2) tr.className = 'adv-row';
+      tr.innerHTML = `
+        <td><span class="rank${idx<2?' top':''}">${idx+1}</span></td>
+        <td>${s.p}</td>
+        <td>${s.w}</td><td>${s.d}</td><td>${s.l}</td>
+        <td>${s.gd>=0?'+'+s.gd:s.gd}</td>
+        <td><span class="pts-val">${s.pts}</span></td>`;
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    card.appendChild(tbl);
+    body.appendChild(card);
+  });
+}
+
+function buildGroups() {
+  const body = document.getElementById('tab-groups');
+  body.innerHTML = '';
+  groups.forEach(g => {
+    const card = document.createElement('div');
+    card.className = `group-card ${g.cls}`;
+    card.innerHTML = `<div class="group-card-title">${g.label.toUpperCase()}</div>
+      <div class="player-list">${g.players.map((p,i)=>`
+        <div class="player-row">
+          <span class="player-num">${i+1}</span>
+          <span class="player-name">${p}</span>
+          <span class="player-flag ${g.playerCol}"></span>
+        </div>`).join('')}
+      </div>`;
+    body.appendChild(card);
+  });
+  const note = document.createElement('p');
+  note.style.cssText = 'font-size:11px;color:var(--muted);text-align:center;margin-top:12px;letter-spacing:.04em';
+  note.textContent = 'Groups randomly drawn · Top 2 advance';
+  body.appendChild(note);
+}
+
+let currentKey = null, scoreA = 0, scoreB = 0;
+let pendingKey = null, pendingPa = '', pendingPb = '';
+let unlocked = false;
+
+function openModal(key, pa, pb) {
+  if (unlocked) {
+    openScoreModal(key, pa, pb);
+  } else {
+    pendingKey = key; pendingPa = pa; pendingPb = pb;
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-error').textContent = '';
+    document.getElementById('pw-modal').classList.add('open');
+    setTimeout(() => document.getElementById('pw-input').focus(), 300);
+  }
+}
+
+function checkPassword() {
+  const val = document.getElementById('pw-input').value;
+  if (val === 'wolfball') {
+    unlocked = true;
+    document.getElementById('pw-modal').classList.remove('open');
+    openScoreModal(pendingKey, pendingPa, pendingPb);
+    pendingKey = null;
+  } else {
+    const err = document.getElementById('pw-error');
+    err.textContent = 'Wrong password. Try again.';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').style.borderColor = '#ff5252';
+    setTimeout(() => { document.getElementById('pw-input').style.borderColor = 'var(--border-bright)'; }, 1000);
+  }
+}
+
+function closePwModal() {
+  document.getElementById('pw-modal').classList.remove('open');
+  pendingKey = null;
+}
+
+function openScoreModal(key, pa, pb) {
+  currentKey = key;
+  const s = scores[key] || [0,0];
+  scoreA = s[0]; scoreB = s[1];
+  document.getElementById('modal-names').textContent = pa + ' vs ' + pb;
+  document.getElementById('modal-pa').textContent = pa;
+  document.getElementById('modal-pb').textContent = pb;
+  document.getElementById('disp-a').textContent = scoreA;
+  document.getElementById('disp-b').textContent = scoreB;
+  document.getElementById('score-modal').classList.add('open');
+}
+
+function adj(side, delta) {
+  if (side === 'a') { scoreA = Math.max(0, scoreA + delta); document.getElementById('disp-a').textContent = scoreA; }
+  else { scoreB = Math.max(0, scoreB + delta); document.getElementById('disp-b').textContent = scoreB; }
+}
+
+function closeModal() {
+  document.getElementById('score-modal').classList.remove('open');
+  currentKey = null;
+}
+
+function saveScore() {
+  if (!currentKey) return;
+  scores[currentKey] = [scoreA, scoreB];
+  closeModal();
+  const activeTab = document.querySelector('.tab.active');
+  const id = activeTab.getAttribute('onclick').match(/'(\w+)'/)[1];
+  if (id === 'schedule') buildSchedule();
+  if (id === 'standings') buildStandings();
+  updateStats();
+  buildSchedule();
+  buildStandings();
+}
+
+function showTab(id, e) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  e.target.classList.add('active');
+  if(id==='standings') buildStandings();
+  if(id==='groups') buildGroups();
+  if(id==='schedule') buildSchedule();
+}
+
+// Close modals on overlay click
+document.getElementById('score-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.getElementById('pw-modal').addEventListener('click', function(e) {
+  if (e.target === this) closePwModal();
+});
+
+buildSchedule();
+buildStandings();
+buildGroups();
+</script>
+</body>
+</html>
